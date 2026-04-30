@@ -49,7 +49,7 @@ def _(io, mo, pd, upload):
 @app.cell
 def _(mo):
     catalogue = mo.ui.dropdown(
-        options=["k10plus", "stabikat"]
+        options=["k10plus", "stabikat", "VD17"]
     )
     catalogue
 
@@ -159,7 +159,8 @@ def _():
     # Constants
     # SRU base URLs
     SBB_SRU_BASE = "https://sru.k10plus.de/opac-de-1"
-    k10plus_SRU_Base = "https://sru.k10plus.de/opac-de-627"
+    k10plus_SRU_BASE = "https://sru.k10plus.de/opac-de-627"
+    VD17_SRU_BASE = "https://sru.k10plus.de/vd17"
 
     # Default SRU parameters
     DEFAULT_RECORD_SCHEMA = "marcxml"
@@ -170,20 +171,32 @@ def _():
     "zs": "http://www.loc.gov/zing/srw/",
     "ppxml": "http://www.oclcpica.org/xmlns/ppxml-1.0"
     }
-    return DEFAULT_RECORD_SCHEMA, NS, SBB_SRU_BASE, k10plus_SRU_Base
+    return (
+        DEFAULT_RECORD_SCHEMA,
+        NS,
+        SBB_SRU_BASE,
+        VD17_SRU_BASE,
+        k10plus_SRU_BASE,
+    )
 
 
 @app.cell
 def _(
     DEFAULT_RECORD_SCHEMA,
     SBB_SRU_BASE,
+    VD17_SRU_BASE,
     catalogue,
-    k10plus_SRU_Base,
+    k10plus_SRU_BASE,
     requests,
     urlencode,
 ):
     def query_sru(query):
-        base_url = SBB_SRU_BASE if catalogue.value == "stabikat" else k10plus_SRU_Base
+        if catalogue.value == "stabikat":
+            base_url = SBB_SRU_BASE
+        if catalogue.value == "k10plus":
+             base_url = k10plus_SRU_BASE
+        if catalogue.value == "VD17":    
+             base_url = VD17_SRU_BASE
 
         #Escape some charaters in the query (but not in the index prefix)
         #pattern = re.compile(r'(?<!pica)\.|\(|\)|<|>|/')
