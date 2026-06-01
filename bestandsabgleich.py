@@ -57,46 +57,42 @@ def _(mo):
     return (catalogue,)
 
 
-@app.cell
-def _(df, mo):
+app._unparsable_cell(
+    """
     column_selector1 = mo.ui.dropdown(
         options=list(df.columns),
-        label="Spalte wählen"
+        label=\"Spalte wählen\"
         )
 
     search_selector1 = mo.ui.dropdown(
-        options={"Signatur (sgb)":"pica.sgb", "Titel (tit)":"pica.tit", "Jahr (jhr)": "pica.jah", "Autor:in (per)":"pica.per"},
-        label="Suchschlüssel wählen"
+        options={\"Signatur (sgb)\":\"pica.sgb\", \"Titel (tit)\":\"pica.tit\", \"Jahr (jhr)\": \"pica.jah\", \"Autor:in (per)\":\"pica.per\", \"Nummer (num):\"pica.num\"},
+        label=\"Suchschlüssel wählen\"
     )
 
     boolean_operator = mo.ui.dropdown(
-        options=["AND", "OR", "NOT"],
-        value="AND"
+        options=[\"AND\", \"OR\", \"NOT\"],
+        value=\"AND\"
     )
 
     column_selector2 = mo.ui.dropdown(
         options=list(df.columns),
-        label="Spalte wählen"
+        label=\"Spalte wählen\"
         )
 
     search_selector2 = mo.ui.dropdown(
-        options={"Signatur (sgb)":"pica.sgb", "Titel (tit)":"pica.tit", "Jahr (jhr)": "pica.jah", "Autor:in (per)":"pica.per"},
-        label="Suchschlüssel wählen"
+        options={\"Signatur (sgb)\":\"pica.sgb\", \"Titel (tit)\":\"pica.tit\", \"Jahr (jhr)\": \"pica.jah\", \"Autor:in (per)\":\"pica.per\", \"Nummer (num):\"pica.num\"},
+        label=\"Suchschlüssel wählen\"
     )
 
     mo.vstack(
-        [mo.md("""## Spalte(n) und Suchschlüssel wählen
-    Wählen Sie die Spalte, deren Werte als Sucheingabe verwendet werden sollen sowie den Suchschlüssel"""),
+        [mo.md(\"\"\"## Spalte(n) und Suchschlüssel wählen
+    Wählen Sie die Spalte, deren Werte als Sucheingabe verwendet werden sollen sowie den Suchschlüssel\"\"\"),
          mo.hstack([column_selector1, search_selector1]),
          boolean_operator,
          mo.hstack([column_selector2, search_selector2])])
-    return (
-        boolean_operator,
-        column_selector1,
-        column_selector2,
-        search_selector1,
-        search_selector2,
-    )
+    """,
+    name="_"
+)
 
 
 @app.cell
