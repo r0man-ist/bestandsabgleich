@@ -84,18 +84,38 @@ def _(df, mo):
         label="Suchschlüssel wählen"
     )
 
+    boolean_operator2 = mo.ui.dropdown(
+        options=["AND", "OR", "NOT"],
+        value="AND"
+    )
+
+    column_selector3 = mo.ui.dropdown(
+        options=list(df.columns),
+        label="Spalte wählen"
+        )
+
+    search_selector3 = mo.ui.dropdown(
+        options={"Signatur (sgb)":"pica.sgb", "Titel (tit)":"pica.tit", "Jahr (jhr)": "pica.jah", "Autor:in (per)":"pica.per", "Nummer (num)":"pica.num"},
+        label="Suchschlüssel wählen"
+    )
+
     mo.vstack(
         [mo.md("""## Spalte(n) und Suchschlüssel wählen
     Wählen Sie die Spalte, deren Werte als Sucheingabe verwendet werden sollen sowie den Suchschlüssel"""),
          mo.hstack([column_selector1, search_selector1]),
          boolean_operator,
-         mo.hstack([column_selector2, search_selector2])])
+         mo.hstack([column_selector2, search_selector2]),
+         boolean_operator2,
+         mo.hstack([column_selector3, search_selector3])])
     return (
         boolean_operator,
+        boolean_operator2,
         column_selector1,
         column_selector2,
+        column_selector3,
         search_selector1,
         search_selector2,
+        search_selector3,
     )
 
 
@@ -254,8 +274,10 @@ def _(NS, etree):
 @app.cell
 def _(
     boolean_operator,
+    boolean_operator2,
     column_selector1,
     column_selector2,
+    column_selector3,
     df,
     input_table,
     mo,
@@ -265,6 +287,7 @@ def _(
     run_button,
     search_selector1,
     search_selector2,
+    search_selector3,
 ):
     mo.stop(not run_button.value)
     df_abgleich = df.copy()
@@ -297,14 +320,23 @@ def _(
             if clause2:
                 clauses.append(clause2)
 
+        if column_selector3.value and search_selector3.value:
+            clause3 = build_clause(search_selector3.value, row[column_selector3.value])
+            if clause3:
+                clauses.append(clause3)
+
         if not clauses:
             results.append((idx, 0, []))
             continue
 
         if len(clauses) == 1:
             query = clauses[0]
-        else:
+        elif len(clauses) == 2:
             query = f" {boolean_operator.value} ".join(clauses)
+        elif len(clauses) == 3:
+            query_part= f" {boolean_operator.value} ".join(clauses[0:2])
+            query = f" {boolean_operator2.value} ".join([query_part, clauses[2]])
+        
 
         api_response = query_sru(query)
         nr_of_records, ppns = parse_sru(api_response)
